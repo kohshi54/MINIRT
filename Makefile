@@ -2,7 +2,7 @@ NAME = miniRT
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-SRCS = main.c event_handler.c draw_map.c
+SRCS = main.c event_handler.c draw_map.c vector.c
 OBJS = $(SRCS:%.c=%.o)
 
 LIBFT = LIBFT/libft.a

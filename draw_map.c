@@ -23,7 +23,10 @@ void	draw_map_on_img(t_data img)
 		j = 0;
 		while (j < WIN_WIDTH)
 		{
-			put_pixel(&img, i, j, 0x0000FF);
+			if (j % 10 == 0)
+				put_pixel(&img, j, i, 0x0000FF);
+			// else
+				// put_pixel(&img, j, i, 0xFF0000);
 			j++;
 		}
 		i++;
