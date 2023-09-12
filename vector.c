@@ -50,3 +50,9 @@ t_vec	vec_init(int x, int y, int z)
 {
 	return ((t_vec){x, y, z});
 }
+
+void	print_vec(t_vec a)
+{
+	// printf("[%d, %d, %d]\n", a.x, a.y, a.z);
+	printf("[%f, %f, %f]\n", a.x, a.y, a.z);
+}

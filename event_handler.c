@@ -19,9 +19,15 @@ int	destory_handler(t_mlx_info *vars)
 
 int	loop_handler(t_mlx_info *mlx_info)
 {
+	t_vec		pe;
+	t_sphere	sp;
+
 	ft_bzero(mlx_info->img.addr, WIN_WIDTH * WIN_HEIGHT \
 				* (mlx_info->img.bits_per_pixel / 8));
-	draw_map_on_img(mlx_info->img);
+	pe = vec_init(0, 0, -5);
+	sp.pc = vec_init(0, 0, 5);
+	sp.r = 1.0;
+	draw_map_on_img(mlx_info->img, pe, sp);
 	mlx_put_image_to_window(mlx_info->mlx, mlx_info->mlx_win, \
 				mlx_info->img.img, 0, 0);
 	return (0);

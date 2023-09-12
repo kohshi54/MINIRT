@@ -12,23 +12,49 @@ void	put_pixel(t_data *data, int x, int y, int color)
 	}
 }
 
-void	draw_map_on_img(t_data img)
+double	detect_collision(t_vec pw, t_vec pe, t_vec pc, double r)
 {
-	size_t	i;
-	size_t	j;
+	t_vec	de;
+	t_vec	vtmp;
+	double	a;
+	double	b;
+	double	c;
+	double	d;
 
-	i = 0;
-	while (i < WIN_HEIGHT)
+	de = vec_sub(pw, pe);
+	vtmp = vec_sub(pe, pc);
+
+	a = vec_mag_sq(de);
+	b = 2 * vec_dot(de, vtmp);
+	c = vec_mag_sq(vtmp) - (r * r);
+
+	d = b * b - 4 * a * c;
+	return (d);
+}
+
+void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp)
+{
+	double	xs;
+	double	ys;
+	t_vec	pw; // スクリーン上の点の位置
+	double	d;
+
+	pw.z = 0;
+	ys = 0;
+	while (ys < WIN_HEIGHT)
 	{
-		j = 0;
-		while (j < WIN_WIDTH)
+		pw.y = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
+		xs = 0;
+		while (xs < WIN_WIDTH)
 		{
-			if (j % 10 == 0)
-				put_pixel(&img, j, i, 0x0000FF);
-			// else
-				// put_pixel(&img, j, i, 0xFF0000);
-			j++;
+			pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
+			d = detect_collision(pw, pe, sp.pc, sp.r);
+			if (d >= 0)
+				put_pixel(&img, ys, xs, 0xFF0000);
+			else
+				put_pixel(&img, ys, xs, 0x0000FF);
+			xs++;
 		}
-		i++;
+		ys++;
 	}
 }
