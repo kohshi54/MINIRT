@@ -41,6 +41,34 @@ typedef struct s_sphere
 	double	r; // 球の半径
 }	t_sphere;
 
+typedef struct s_ambient_light
+{
+	double	ka;
+	double	ia;
+}	t_ambient_light;
+
+typedef struct s_diffuse_reflection
+{
+	double	kd;
+	double	ii;
+	double	nldot;
+}	t_diffuse_reflection;
+
+typedef struct s_specular_reflection
+{
+	double	ks;
+	double	ii;
+	double	a;
+	double	vrdot;
+}	t_specular_reflection;
+
+typedef struct s_phong_model
+{
+	t_ambient_light			ambient;
+	t_diffuse_reflection	diffuse;
+	t_specular_reflection	specular;
+}	t_phong_model;
+
 int		key_handler(int keycode, t_mlx_info *vars);
 int		destory_handler(t_mlx_info *vars);
 int		loop_handler(t_mlx_info *mlx_info);
