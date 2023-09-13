@@ -44,7 +44,7 @@ typedef struct s_sphere
 int		key_handler(int keycode, t_mlx_info *vars);
 int		destory_handler(t_mlx_info *vars);
 int		loop_handler(t_mlx_info *mlx_info);
-void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp);
+void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl);
 
 t_vec	vec_add(t_vec a, t_vec b);
 t_vec	vec_sub(t_vec a, t_vec b);
