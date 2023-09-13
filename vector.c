@@ -10,7 +10,7 @@ t_vec	vec_sub(t_vec a, t_vec b)
 	return ((t_vec){a.x - b.x, a.y - b.y, a.z - b.z});
 }
 
-t_vec	vec_mult(t_vec a, int k)
+t_vec	vec_mult(t_vec a, double k)
 {
 	return ((t_vec){k * a.x, k * a.y, k * a.z});
 }
@@ -42,11 +42,12 @@ double	vec_mag_sq(t_vec a)
 t_vec	vec_norm(t_vec a)
 {
 	double	mag = vec_mag(a);
-	// mag == 0 -> error
+	if (mag == 0)
+		return (t_vec){0.0, 0.0, 0.0};
 	return ((t_vec){a.x / mag, a.y / mag, a.z / mag});
 }
 
-t_vec	vec_init(int x, int y, int z)
+t_vec	vec_init(double x, double y, double z)
 {
 	return ((t_vec){x, y, z});
 }

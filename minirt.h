@@ -48,13 +48,13 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl);
 
 t_vec	vec_add(t_vec a, t_vec b);
 t_vec	vec_sub(t_vec a, t_vec b);
-t_vec	vec_mult(t_vec a, int k);
+t_vec	vec_mult(t_vec a, double k);
 double	vec_dot(t_vec a, t_vec b);
 t_vec	vec_cross(t_vec a, t_vec b);
 double	vec_mag(t_vec a);
 double	vec_mag_sq(t_vec a);
 t_vec	vec_norm(t_vec a);
-t_vec	vec_init(int x, int y, int z);
+t_vec	vec_init(double x, double y, double z);
 void	print_vec(t_vec a);
 
 #endif

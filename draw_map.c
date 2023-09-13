@@ -21,7 +21,7 @@ double	get_vect(double a, double b, double d)
 	t = -1;
 	if (d == 0)
 	{
-		t = -b / 2 * a;
+		t = -b / (2 * a);
 	}
 	else if (d > 0)
 	{
@@ -85,12 +85,12 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 	double	nldot;
 	int	gray;
 
-	pw.z = 0;
-	ys = 0;
+	pw.z = 0.0;
+	ys = 0.0;
 	while (ys < WIN_HEIGHT)
 	{
 		pw.y = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
-		xs = 0;
+		xs = 0.0;
 		while (xs < WIN_WIDTH)
 		{
 			pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
