@@ -48,18 +48,11 @@ typedef	struct s_plane
 	t_vec	p;
 }	t_plane;
 
-typedef enum e_token_kind
+typedef enum e_object_type
 {
 	O_SPHERE,
 	O_PLANE,
-}	t_token_kind;
-
-typedef struct s_object
-{
-	int		type;
-	void	*obj;
-	void	*next;
-}	t_object;
+}	t_object_type;
 
 typedef struct s_color
 {
@@ -68,33 +61,16 @@ typedef struct s_color
 	double	b;
 }	t_color;
 
-typedef struct s_ambient_light
+typedef struct s_object
 {
-	t_color	ka;
-	t_color	ia;
-}	t_ambient_light;
-
-typedef struct s_diffuse_reflection
-{
-	t_color	kd;
-	t_color	ii;
-	double	nldot;
-}	t_diffuse_reflection;
-
-typedef struct s_specular_reflection
-{
-	t_color	ks;
-	double	ii;
+	int		type;
+	void	*obj;
+	void	*next;
+	t_color	ambient;
+	t_color	diffuse;
+	t_color	specular;
 	double	a;
-	double	vrdot;
-}	t_specular_reflection;
-
-typedef struct s_phong_model
-{
-	t_ambient_light			ambient;
-	t_diffuse_reflection	diffuse;
-	t_specular_reflection	specular;
-}	t_phong_model;
+}	t_object;
 
 int		key_handler(int keycode, t_mlx_info *vars);
 int		destory_handler(t_mlx_info *vars);

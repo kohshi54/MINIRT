@@ -89,16 +89,6 @@ t_color	set_color(double r, double g, double b)
 	return ((t_color){r, g, b});
 }
 
-void	set_lighting_params(t_phong_model *phong)
-{
-	phong->diffuse.kd = set_color(0.69, 0, 0);
-	phong->diffuse.ii = set_color(1.00, 1.00, 1.00);
-	phong->ambient.ka = set_color(0.01, 0.01, 0.01);
-	phong->ambient.ia = set_color(0.10, 0.10, 0.10);
-	phong->specular.ks = set_color(0.30, 0.30, 0.30);
-	phong->specular.a = 8;
-}
-
 double	constraint(double src, double min, double max)
 {
 	if (src < min)
@@ -118,7 +108,6 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 	t_vec	pi;
 	t_vec	l;
 	t_vec	n;
-	t_phong_model	phong;
 
 	t_color	ra;
 	t_color	rd;
@@ -128,18 +117,20 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 	t_color	rr;
 	t_color	rs;
 
+	t_color	ia = set_color(0.10, 0.10, 0.10);
+	t_color	ii = set_color(1.00, 1.00, 1.00);
+
+	double	nldot;
+	double	vrdot;
+
 	pw.z = 0.0;
 	ys = 0.0;
-	set_lighting_params(&phong);
 	while (ys < WIN_HEIGHT)
 	{
 		pw.y = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
 		xs = 0.0;
 		while (xs < WIN_WIDTH)
 		{
-			ra.r = phong.ambient.ka.r * phong.ambient.ia.r;
-			ra.g = phong.ambient.ka.g * phong.ambient.ia.g;
-			ra.b = phong.ambient.ka.b * phong.ambient.ia.b;
 			pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
 			de = vec_sub(pw, pe);
 
@@ -167,27 +158,32 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 			put_pixel(&img, xs, ys, rgb2hex(100, 149, 237));
 			if (nearest_obj != NULL)
 			{
+				ra.r = nearest_obj->ambient.r * ia.r;
+				ra.g = nearest_obj->ambient.g * ia.g;
+				ra.b = nearest_obj->ambient.b * ia.b;
+
 				pi = vec_add(pe, vec_mult(de, t));
 				l = vec_norm(vec_sub(pl, pi));
 				if (nearest_obj->type == O_SPHERE)
 					n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
 				else if (nearest_obj->type == O_PLANE)
 					n = vec_norm(((t_plane *)nearest_obj->obj)->n);
-				phong.diffuse.nldot = constraint(vec_dot(n, l), 0, 1);
+				nldot = constraint(vec_dot(n, l), 0, 1);;
 
-				rd.r = phong.diffuse.kd.r * phong.diffuse.ii.r * phong.diffuse.nldot;
-				rd.g = phong.diffuse.kd.g * phong.diffuse.ii.g * phong.diffuse.nldot;
-				rd.b = phong.diffuse.kd.b * phong.diffuse.ii.b * phong.diffuse.nldot;
+				rd.r = nearest_obj->diffuse.r * ii.r * nldot;
+				rd.g = nearest_obj->diffuse.g * ii.g * nldot;
+				rd.b = nearest_obj->diffuse.b * ii.b * nldot;
 
 				rs = set_color(0.0, 0.0, 0.0);
-				if (phong.diffuse.nldot > 0)
+				if (nldot > 0)
 				{
-					rvec = vec_sub(vec_mult(n, 2 * phong.diffuse.nldot), l);
+					rvec = vec_sub(vec_mult(n, 2 * nldot), l);
 					v = vec_norm(vec_mult(de, -1));
-					phong.specular.vrdot = constraint(vec_dot(v, rvec), 0, 1);
-					rs.r = phong.specular.ks.r * phong.diffuse.ii.r * pow(phong.specular.vrdot, phong.specular.a);
-					rs.g = phong.specular.ks.g * phong.diffuse.ii.g * pow(phong.specular.vrdot, phong.specular.a);
-					rs.b = phong.specular.ks.b * phong.diffuse.ii.b * pow(phong.specular.vrdot, phong.specular.a);
+					vrdot = constraint(vec_dot(v, rvec), 0, 1);
+
+					rs.r = nearest_obj->specular.r * ii.r * pow(vrdot, nearest_obj->a);
+					rs.g = nearest_obj->specular.g * ii.g * pow(vrdot, nearest_obj->a);
+					rs.b = nearest_obj->specular.b * ii.b * pow(vrdot, nearest_obj->a);
 				}
 				rr.r = constraint(ra.r + rd.r + rs.r, 0, 1);
 				rr.g = constraint(ra.g + rd.g + rs.g, 0, 1);
