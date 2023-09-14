@@ -46,7 +46,7 @@ double	get_vect(double a, double b, double d)
 	return (t);
 }
 
-double	detect_collision_and_get_vect(t_vec pe, t_sphere sp, t_vec de)
+double	detect_collision_and_get_vect(t_vec pe, t_object *obj_list, t_vec de)
 {
 	t_vec	vtmp;
 	double	a;
@@ -55,11 +55,11 @@ double	detect_collision_and_get_vect(t_vec pe, t_sphere sp, t_vec de)
 	double	d;
 	double	t;
 
-	vtmp = vec_sub(pe, sp.pc);
+	vtmp = vec_sub(pe, ((t_sphere *)obj_list->obj)->pc);
 
 	a = vec_mag_sq(de);
 	b = 2 * vec_dot(de, vtmp);
-	c = vec_mag_sq(vtmp) - (sp.r * sp.r);
+	c = vec_mag_sq(vtmp) - (((t_sphere *)obj_list->obj)->r * ((t_sphere *)obj_list->obj)->r);
 
 	d = b * b - 4 * a * c;
 
@@ -96,7 +96,7 @@ double	constraint(double src, double min, double max)
 	return (src);
 }
 
-void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
+void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 {
 	double	xs;
 	double	ys;
@@ -130,13 +130,29 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 			ra.b = phong.ambient.ka.b * phong.ambient.ia.b;
 			pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
 			de = vec_sub(pw, pe);
-			t = detect_collision_and_get_vect(pe, sp, de);
-			put_pixel(&img, ys, xs, rgb2hex(100, 149, 237));
-			if (t > 0)
+
+			t_object *head = obj_list;
+			t = -1;
+			t_object *nearest_obj = NULL;
+			double min = LLONG_MAX;
+			while (obj_list)
+			{
+				double ttmp = detect_collision_and_get_vect(pe, obj_list, de);
+				if (-1 != ttmp && ttmp < min)
+				{
+					nearest_obj = obj_list;
+					t = ttmp;
+				}
+				obj_list = obj_list->next;
+			}
+			obj_list = head;
+
+			put_pixel(&img, xs, ys, rgb2hex(100, 149, 237));
+			if (nearest_obj != NULL)
 			{
 				pi = vec_add(pe, vec_mult(de, t));
 				l = vec_norm(vec_sub(pl, pi));
-				n = vec_norm(vec_sub(pi, sp.pc));
+				n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
 				phong.diffuse.nldot = constraint(vec_dot(n, l), 0, 1);
 
 				rd.r = phong.diffuse.kd.r * phong.diffuse.ii.r * phong.diffuse.nldot;
@@ -156,10 +172,11 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 				rr.r = constraint(ra.r + rd.r + rs.r, 0, 1);
 				rr.g = constraint(ra.g + rd.g + rs.g, 0, 1);
 				rr.b = constraint(ra.b + rd.b + rs.b, 0, 1);
-				put_pixel(&img, ys, xs, rgb2hex((int)255 * rr.r, (int)255 * rr.g, (int)255 * rr.b));
+				put_pixel(&img, xs, ys, rgb2hex((int)255 * rr.r, (int)255 * rr.g, (int)255 * rr.b));
 			}
 			xs++;
 		}
+		// printf("\n");
 		ys++;
 	}
 }

@@ -7,6 +7,7 @@
 # include "minilibx/mlx.h"
 # include "libft/libft.h"
 # include <math.h>
+# include <stddef.h>
 
 # define WIN_WIDTH 512
 # define WIN_HEIGHT 512
@@ -40,6 +41,13 @@ typedef struct s_sphere
 	t_vec	pc; // 球の中心位置
 	double	r; // 球の半径
 }	t_sphere;
+
+typedef struct s_object
+{
+	// int		type;
+	void	*obj;
+	void	*next;
+}	t_object;
 
 typedef struct s_color
 {
@@ -79,7 +87,8 @@ typedef struct s_phong_model
 int		key_handler(int keycode, t_mlx_info *vars);
 int		destory_handler(t_mlx_info *vars);
 int		loop_handler(t_mlx_info *mlx_info);
-void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl);
+// void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl);
+void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl);
 
 t_vec	vec_add(t_vec a, t_vec b);
 t_vec	vec_sub(t_vec a, t_vec b);
