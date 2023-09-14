@@ -72,11 +72,18 @@ typedef struct s_object
 	double	a;
 }	t_object;
 
+typedef struct s_light
+{
+	t_vec	pl;
+	t_vec	intensity;
+	struct s_light	*next;
+}	t_light;
+
 int		key_handler(int keycode, t_mlx_info *vars);
 int		destory_handler(t_mlx_info *vars);
 int		loop_handler(t_mlx_info *mlx_info);
 // void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl);
-void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl);
+void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *pl);
 
 t_vec	vec_add(t_vec a, t_vec b);
 t_vec	vec_sub(t_vec a, t_vec b);

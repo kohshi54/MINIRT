@@ -98,7 +98,7 @@ double	constraint(double src, double min, double max)
 	return (src);
 }
 
-void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
+void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 {
 	double	xs;
 	double	ys;
@@ -163,28 +163,35 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 				ra.b = nearest_obj->ambient.b * ia.b;
 
 				pi = vec_add(pe, vec_mult(de, t));
-				l = vec_norm(vec_sub(pl, pi));
-				if (nearest_obj->type == O_SPHERE)
-					n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
-				else if (nearest_obj->type == O_PLANE)
-					n = vec_norm(((t_plane *)nearest_obj->obj)->n);
-				nldot = constraint(vec_dot(n, l), 0, 1);;
-
-				rd.r = nearest_obj->diffuse.r * ii.r * nldot;
-				rd.g = nearest_obj->diffuse.g * ii.g * nldot;
-				rd.b = nearest_obj->diffuse.b * ii.b * nldot;
-
+				t_light *lhead = plh;
+				rd = set_color(0.0, 0.0, 0.0);
 				rs = set_color(0.0, 0.0, 0.0);
-				if (nldot > 0)
+				while (plh != NULL)
 				{
-					rvec = vec_sub(vec_mult(n, 2 * nldot), l);
-					v = vec_norm(vec_mult(de, -1));
-					vrdot = constraint(vec_dot(v, rvec), 0, 1);
+					l = vec_norm(vec_sub(plh->pl, pi));
+					if (nearest_obj->type == O_SPHERE)
+						n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
+					else if (nearest_obj->type == O_PLANE)
+						n = vec_norm(((t_plane *)nearest_obj->obj)->n);
+					nldot = constraint(vec_dot(n, l), 0, 1);;
 
-					rs.r = nearest_obj->specular.r * ii.r * pow(vrdot, nearest_obj->a);
-					rs.g = nearest_obj->specular.g * ii.g * pow(vrdot, nearest_obj->a);
-					rs.b = nearest_obj->specular.b * ii.b * pow(vrdot, nearest_obj->a);
+					rd.r += nearest_obj->diffuse.r * ii.r * nldot;
+					rd.g += nearest_obj->diffuse.g * ii.g * nldot;
+					rd.b += nearest_obj->diffuse.b * ii.b * nldot;
+
+					if (nldot > 0)
+					{
+						rvec = vec_sub(vec_mult(n, 2 * nldot), l);
+						v = vec_norm(vec_mult(de, -1));
+						vrdot = constraint(vec_dot(v, rvec), 0, 1);
+
+						rs.r += nearest_obj->specular.r * ii.r * pow(vrdot, nearest_obj->a);
+						rs.g += nearest_obj->specular.g * ii.g * pow(vrdot, nearest_obj->a);
+						rs.b += nearest_obj->specular.b * ii.b * pow(vrdot, nearest_obj->a);
+					}
+					plh = plh->next;
 				}
+				plh = lhead;
 				rr.r = constraint(ra.r + rd.r + rs.r, 0, 1);
 				rr.g = constraint(ra.g + rd.g + rs.g, 0, 1);
 				rr.b = constraint(ra.b + rd.b + rs.b, 0, 1);
