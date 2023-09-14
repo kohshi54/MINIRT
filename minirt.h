@@ -41,22 +41,29 @@ typedef struct s_sphere
 	double	r; // 球の半径
 }	t_sphere;
 
+typedef struct s_color
+{
+	double	r;
+	double	g;
+	double	b;
+}	t_color;
+
 typedef struct s_ambient_light
 {
-	double	ka;
-	double	ia;
+	t_color	ka;
+	t_color	ia;
 }	t_ambient_light;
 
 typedef struct s_diffuse_reflection
 {
-	double	kd;
-	double	ii;
+	t_color	kd;
+	t_color	ii;
 	double	nldot;
 }	t_diffuse_reflection;
 
 typedef struct s_specular_reflection
 {
-	double	ks;
+	t_color	ks;
 	double	ii;
 	double	a;
 	double	vrdot;

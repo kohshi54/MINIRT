@@ -72,14 +72,28 @@ int	rgb2hex(int r, int g, int b)
 	return (((int)r << 16) | ((int)g << 8) | (int)b);
 }
 
+t_color	set_color(double r, double g, double b)
+{
+	return ((t_color){r, g, b});
+}
+
 void	set_lighting_params(t_phong_model *phong)
 {
-	phong->diffuse.kd = 0.69;
-	phong->diffuse.ii = 1.0;
-	phong->ambient.ka = 0.01;
-	phong->ambient.ia = 0.1;
-	phong->specular.ks = 0.3;
+	phong->diffuse.kd = set_color(0.69, 0, 0);
+	phong->diffuse.ii = set_color(1.00, 1.00, 1.00);
+	phong->ambient.ka = set_color(0.01, 0.01, 0.01);
+	phong->ambient.ia = set_color(0.10, 0.10, 0.10);
+	phong->specular.ks = set_color(0.30, 0.30, 0.30);
 	phong->specular.a = 8;
+}
+
+double	constraint(double src, double min, double max)
+{
+	if (src < min)
+		return (min);
+	if (src > max)
+		return (max);
+	return (src);
 }
 
 void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
@@ -94,14 +108,13 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 	t_vec	n;
 	t_phong_model	phong;
 
-	int		gray;
-	double	ra;
-	double	rd;
+	t_color	ra;
+	t_color	rd;
 
 	t_vec	rvec;
 	t_vec	v;
-	double	rr;
-	double	rs;
+	t_color	rr;
+	t_color	rs;
 
 	pw.z = 0.0;
 	ys = 0.0;
@@ -112,7 +125,9 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 		xs = 0.0;
 		while (xs < WIN_WIDTH)
 		{
-			ra = phong.ambient.ka * phong.ambient.ia;
+			ra.r = phong.ambient.ka.r * phong.ambient.ia.r;
+			ra.g = phong.ambient.ka.g * phong.ambient.ia.g;
+			ra.b = phong.ambient.ka.b * phong.ambient.ia.b;
 			pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
 			de = vec_sub(pw, pe);
 			t = detect_collision_and_get_vect(pe, sp, de);
@@ -126,8 +141,13 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 				if (phong.diffuse.nldot < 0)
 					phong.diffuse.nldot = 0;
 
-				rd = phong.diffuse.kd * phong.diffuse.ii * phong.diffuse.nldot;
-				rs = 0.0;
+				rd.r = phong.diffuse.kd.r * phong.diffuse.ii.r * phong.diffuse.nldot;
+				rd.g = phong.diffuse.kd.g * phong.diffuse.ii.g * phong.diffuse.nldot;
+				rd.b = phong.diffuse.kd.b * phong.diffuse.ii.b * phong.diffuse.nldot;
+
+				rs.r = 0.0;
+				rs.g = 0.0;
+				rs.b = 0.0;
 				if (phong.diffuse.nldot > 0)
 				{
 					rvec = vec_sub(vec_mult(n, 2 * phong.diffuse.nldot), l);
@@ -135,13 +155,14 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 					phong.specular.vrdot = vec_dot(v, rvec);
 					if (phong.specular.vrdot < 0)
 						phong.specular.vrdot = 0;
-					rs = phong.specular.ks * phong.diffuse.ii * pow(phong.specular.vrdot, phong.specular.a);
+					rs.r = phong.specular.ks.r * phong.diffuse.ii.r * pow(phong.specular.vrdot, phong.specular.a);
+					rs.g = phong.specular.ks.g * phong.diffuse.ii.g * pow(phong.specular.vrdot, phong.specular.a);
+					rs.b = phong.specular.ks.b * phong.diffuse.ii.b * pow(phong.specular.vrdot, phong.specular.a);
 				}
-				rr = ra + rd + rs;
-				if (rr < 0)
-					rr = 0;
-				gray = (int)255 * rr;
-				put_pixel(&img, ys, xs, rgb2hex(gray, gray, gray));
+				rr.r = constraint(ra.r + rd.r + rs.r, 0, 1);
+				rr.g = constraint(ra.g + rd.g + rs.g, 0, 1);
+				rr.b = constraint(ra.b + rd.b + rs.b, 0, 1);
+				put_pixel(&img, ys, xs, rgb2hex((int)255 * rr.r, (int)255 * rr.g, (int)255 * rr.b));
 			}
 			xs++;
 		}
