@@ -137,24 +137,18 @@ void	draw_map_on_img(t_data img, t_vec pe, t_sphere sp, t_vec pl)
 				pi = vec_add(pe, vec_mult(de, t));
 				l = vec_norm(vec_sub(pl, pi));
 				n = vec_norm(vec_sub(pi, sp.pc));
-				phong.diffuse.nldot = vec_dot(n, l);
-				if (phong.diffuse.nldot < 0)
-					phong.diffuse.nldot = 0;
+				phong.diffuse.nldot = constraint(vec_dot(n, l), 0, 1);
 
 				rd.r = phong.diffuse.kd.r * phong.diffuse.ii.r * phong.diffuse.nldot;
 				rd.g = phong.diffuse.kd.g * phong.diffuse.ii.g * phong.diffuse.nldot;
 				rd.b = phong.diffuse.kd.b * phong.diffuse.ii.b * phong.diffuse.nldot;
 
-				rs.r = 0.0;
-				rs.g = 0.0;
-				rs.b = 0.0;
+				rs = set_color(0.0, 0.0, 0.0);
 				if (phong.diffuse.nldot > 0)
 				{
 					rvec = vec_sub(vec_mult(n, 2 * phong.diffuse.nldot), l);
 					v = vec_norm(vec_mult(de, -1));
-					phong.specular.vrdot = vec_dot(v, rvec);
-					if (phong.specular.vrdot < 0)
-						phong.specular.vrdot = 0;
+					phong.specular.vrdot = constraint(vec_dot(v, rvec), 0, 1);
 					rs.r = phong.specular.ks.r * phong.diffuse.ii.r * pow(phong.specular.vrdot, phong.specular.a);
 					rs.g = phong.specular.ks.g * phong.diffuse.ii.g * pow(phong.specular.vrdot, phong.specular.a);
 					rs.b = phong.specular.ks.b * phong.diffuse.ii.b * pow(phong.specular.vrdot, phong.specular.a);
