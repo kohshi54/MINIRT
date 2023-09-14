@@ -42,9 +42,21 @@ typedef struct s_sphere
 	double	r; // 球の半径
 }	t_sphere;
 
+typedef	struct s_plane
+{
+	t_vec	n;
+	t_vec	p;
+}	t_plane;
+
+typedef enum e_token_kind
+{
+	O_SPHERE,
+	O_PLANE,
+}	t_token_kind;
+
 typedef struct s_object
 {
-	// int		type;
+	int		type;
 	void	*obj;
 	void	*next;
 }	t_object;

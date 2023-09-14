@@ -12,7 +12,7 @@ void	put_pixel(t_data *data, int x, int y, int color)
 	}
 }
 
-double	get_vect(double a, double b, double d)
+double	get_vect_sphere(double a, double b, double d)
 {
 	double	t;
 	double	t1;
@@ -46,7 +46,7 @@ double	get_vect(double a, double b, double d)
 	return (t);
 }
 
-double	detect_collision_and_get_vect(t_vec pe, t_object *obj_list, t_vec de)
+double	detect_collision_and_get_vect_sphere(t_vec pe, t_object *obj_list, t_vec de)
 {
 	t_vec	vtmp;
 	double	a;
@@ -63,7 +63,19 @@ double	detect_collision_and_get_vect(t_vec pe, t_object *obj_list, t_vec de)
 
 	d = b * b - 4 * a * c;
 
-	t = get_vect(a, b, d);
+	t = get_vect_sphere(a, b, d);
+	return (t);
+}
+
+double	detect_collision_and_get_vect_plane(t_vec pe, t_object *obj_list, t_vec de)
+{
+	double	t;
+
+	if (-(vec_dot(de, ((t_plane *)obj_list->obj)->n)) == 0)
+		return (-1);
+	t = vec_dot(vec_sub(pe, ((t_plane *)obj_list->obj)->p), ((t_plane *)obj_list->obj)->n) / -(vec_dot(de, ((t_plane *)obj_list->obj)->n));
+	if (t < 0)
+		return (-1);
 	return (t);
 }
 
@@ -137,11 +149,16 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 			double min = LLONG_MAX;
 			while (obj_list)
 			{
-				double ttmp = detect_collision_and_get_vect(pe, obj_list, de);
+				double ttmp = -1;
+				if (obj_list->type == O_SPHERE)
+					ttmp = detect_collision_and_get_vect_sphere(pe, obj_list, de);
+				else if (obj_list->type == O_PLANE)
+					ttmp = detect_collision_and_get_vect_plane(pe, obj_list, de);
 				if (-1 != ttmp && ttmp < min)
 				{
 					nearest_obj = obj_list;
 					t = ttmp;
+					min = ttmp;
 				}
 				obj_list = obj_list->next;
 			}
@@ -152,7 +169,10 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 			{
 				pi = vec_add(pe, vec_mult(de, t));
 				l = vec_norm(vec_sub(pl, pi));
-				n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
+				if (nearest_obj->type == O_SPHERE)
+					n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
+				else if (nearest_obj->type == O_PLANE)
+					n = vec_norm(((t_plane *)nearest_obj->obj)->n);
 				phong.diffuse.nldot = constraint(vec_dot(n, l), 0, 1);
 
 				rd.r = phong.diffuse.kd.r * phong.diffuse.ii.r * phong.diffuse.nldot;
@@ -176,7 +196,6 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_vec pl)
 			}
 			xs++;
 		}
-		// printf("\n");
 		ys++;
 	}
 }
