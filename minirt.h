@@ -14,6 +14,8 @@
 
 # define ESC_KEY 53
 
+# define EPSILON (1.0f / 512)
+
 typedef struct s_data {
 	void	*img;
 	char	*addr;

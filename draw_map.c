@@ -145,7 +145,7 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 					ttmp = detect_collision_and_get_vect_sphere(pe, obj_list, de);
 				else if (obj_list->type == O_PLANE)
 					ttmp = detect_collision_and_get_vect_plane(pe, obj_list, de);
-				if (-1 != ttmp && ttmp < min)
+				if (-1 != ttmp && ttmp < min && ttmp > 0)
 				{
 					nearest_obj = obj_list;
 					t = ttmp;
@@ -169,25 +169,51 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 				while (plh != NULL)
 				{
 					l = vec_norm(vec_sub(plh->pl, pi));
-					if (nearest_obj->type == O_SPHERE)
-						n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
-					else if (nearest_obj->type == O_PLANE)
-						n = vec_norm(((t_plane *)nearest_obj->obj)->n);
-					nldot = constraint(vec_dot(n, l), 0, 1);;
 
-					rd.r += nearest_obj->diffuse.r * ii.r * nldot;
-					rd.g += nearest_obj->diffuse.g * ii.g * nldot;
-					rd.b += nearest_obj->diffuse.b * ii.b * nldot;
+					double dl;
+					dl = vec_mag(vec_sub(plh->pl, pi)) - EPSILON;
+					t_vec shadow_s = vec_add(pi, vec_mult(l, EPSILON));
 
-					if (nldot > 0)
+					t_object *head2 = obj_list;
+					bool flg = 1;
+					while (obj_list)
 					{
-						rvec = vec_sub(vec_mult(n, 2 * nldot), l);
-						v = vec_norm(vec_mult(de, -1));
-						vrdot = constraint(vec_dot(v, rvec), 0, 1);
+						double ttmp2 = -1;
+						if (obj_list->type == O_SPHERE)
+							ttmp2 = detect_collision_and_get_vect_sphere(shadow_s, obj_list, l);
+						else if (obj_list->type == O_PLANE)
+							ttmp2 = detect_collision_and_get_vect_plane(shadow_s, obj_list, l);
+						if (ttmp2 != -1 && dl > ttmp2 && ttmp2 > 0)
+						{
+							flg = 0;
+							break ;
+						}
+						obj_list = obj_list->next;
+					}
+					obj_list = head2;
 
-						rs.r += nearest_obj->specular.r * ii.r * pow(vrdot, nearest_obj->a);
-						rs.g += nearest_obj->specular.g * ii.g * pow(vrdot, nearest_obj->a);
-						rs.b += nearest_obj->specular.b * ii.b * pow(vrdot, nearest_obj->a);
+					if (flg == 1)
+					{
+						if (nearest_obj->type == O_SPHERE)
+							n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
+						else if (nearest_obj->type == O_PLANE)
+							n = vec_norm(((t_plane *)nearest_obj->obj)->n);
+						nldot = constraint(vec_dot(n, l), 0, 1);;
+
+						rd.r += nearest_obj->diffuse.r * ii.r * nldot;
+						rd.g += nearest_obj->diffuse.g * ii.g * nldot;
+						rd.b += nearest_obj->diffuse.b * ii.b * nldot;
+
+						if (nldot > 0)
+						{
+							rvec = vec_sub(vec_mult(n, 2 * nldot), l);
+							v = vec_norm(vec_mult(de, -1));
+							vrdot = constraint(vec_dot(v, rvec), 0, 1);
+
+							rs.r += nearest_obj->specular.r * ii.r * pow(vrdot, nearest_obj->a);
+							rs.g += nearest_obj->specular.g * ii.g * pow(vrdot, nearest_obj->a);
+							rs.b += nearest_obj->specular.b * ii.b * pow(vrdot, nearest_obj->a);
+						}
 					}
 					plh = plh->next;
 				}
