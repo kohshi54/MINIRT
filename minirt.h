@@ -50,10 +50,18 @@ typedef	struct s_plane
 	t_vec	p;
 }	t_plane;
 
+typedef struct s_cylinder
+{
+	t_vec	pc; // 円柱の中心位置
+	double	r; // 半径
+	double	h; // 高さ
+}	t_cylinder;
+
 typedef enum e_object_type
 {
 	O_SPHERE,
 	O_PLANE,
+	O_CYLINDER,
 }	t_object_type;
 
 typedef struct s_color

@@ -46,6 +46,40 @@ double	get_vect_sphere(double a, double b, double d)
 	return (t);
 }
 
+double	get_vect_cylinder(double a, double b, double d)
+{
+	double	t;
+	double	t1;
+	double	t2;
+
+	t = -1;
+	if (d == 0)
+	{
+		t = -b / (2 * a);
+	}
+	else if (d > 0)
+	{
+		t1 = (-b - sqrt(d)) / (2 * a);
+		t2 = (-b + sqrt(d)) / (2 * a);
+
+		if (t1 > 0 && t2 > 0)
+		{
+			if (t1 > t2)
+				t = t2;
+			else
+				t = t1;
+		}
+		else
+		{
+			if (t1 > t2)
+				t = t1;
+			else
+				t = t2;
+		}
+	}
+	return (t);
+}
+
 double	detect_collision_and_get_vect_sphere(t_vec pe, t_object *obj_list, t_vec de)
 {
 	t_vec	vtmp;
@@ -75,6 +109,48 @@ double	detect_collision_and_get_vect_plane(t_vec pe, t_object *obj_list, t_vec d
 		return (-1);
 	t = vec_dot(vec_sub(pe, ((t_plane *)obj_list->obj)->p), ((t_plane *)obj_list->obj)->n) / -(vec_dot(de, ((t_plane *)obj_list->obj)->n));
 	if (t < 0)
+		return (-1);
+	return (t);
+}
+
+double	detect_collision_and_get_vect_cylinder(t_vec pe, t_object *obj_list, t_vec de)
+{
+	// t_vec	vtmp;
+	double	a;
+	double	b;
+	double	c;
+	double	d;
+	double	t;
+	double	M[3][3] = {
+		{1.0, 0.0, 0.0},
+		{0.0, 0.0, 0.0},
+		{0.0, 0.0, 1.0}
+	};
+
+	t_vec	dm;
+	dm.x = de.x * M[0][0] + de.y * M[1][0] + de.z * M[2][0];
+	dm.y = de.x * M[0][1] + de.y * M[1][1] + de.z * M[2][1];
+	dm.z = de.x * M[0][2] + de.y * M[1][2] + de.z * M[2][2];
+
+	t_vec	m = vec_sub(pe, ((t_cylinder *)obj_list->obj)->pc);
+	t_vec	mm;
+	mm.x = m.x * M[0][0] + m.y * M[1][0] + m.z * M[2][0];
+	mm.y = m.x * M[0][1] + m.y * M[1][1] + m.z * M[2][1];
+	mm.z = m.x * M[0][2] + m.y * M[1][2] + m.z * M[2][2];
+
+	a = vec_mag_sq(dm);
+	b = 2 * vec_dot(dm, mm);
+	c = vec_mag_sq(mm) - (((t_cylinder *)obj_list->obj)->r * ((t_cylinder *)obj_list->obj)->r);
+	if (a == 0 && c < 0)
+		return (-1);
+
+	d = b * b - 4 * a * c;
+
+	t = get_vect_cylinder(a, b, d);
+
+	/* calc valid */
+	double valid = pe.y + t * de.y;
+	if (valid < -((t_cylinder *)obj_list->obj)->h / 2.0 || ((t_cylinder *)obj_list->obj)->h / 2.0 < valid)
 		return (-1);
 	return (t);
 }
@@ -145,6 +221,8 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 					ttmp = detect_collision_and_get_vect_sphere(pe, obj_list, de);
 				else if (obj_list->type == O_PLANE)
 					ttmp = detect_collision_and_get_vect_plane(pe, obj_list, de);
+				else if (obj_list->type == O_CYLINDER)
+					ttmp = detect_collision_and_get_vect_cylinder(pe, obj_list, de);
 				if (-1 != ttmp && ttmp < min && ttmp > 0)
 				{
 					nearest_obj = obj_list;
@@ -183,6 +261,8 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 							ttmp2 = detect_collision_and_get_vect_sphere(shadow_s, obj_list, l);
 						else if (obj_list->type == O_PLANE)
 							ttmp2 = detect_collision_and_get_vect_plane(shadow_s, obj_list, l);
+						else if (obj_list->type == O_CYLINDER)
+							ttmp2 = detect_collision_and_get_vect_cylinder(shadow_s, obj_list, l);
 						if (ttmp2 != -1 && dl > ttmp2 && ttmp2 > 0)
 						{
 							flg = 0;
@@ -198,6 +278,8 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 							n = vec_norm(vec_sub(pi, ((t_sphere *)nearest_obj->obj)->pc));
 						else if (nearest_obj->type == O_PLANE)
 							n = vec_norm(((t_plane *)nearest_obj->obj)->n);
+						else if (nearest_obj->type == O_CYLINDER)
+							n = vec_norm(vec_sub(vec_add(pe, vec_mult(de, t)), ((t_cylinder *)nearest_obj->obj)->pc));
 						nldot = constraint(vec_dot(n, l), 0, 1);;
 
 						rd.r += nearest_obj->diffuse.r * ii.r * nldot;
