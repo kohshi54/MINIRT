@@ -169,7 +169,7 @@ double	constraint(double src, double min, double max)
 	return (src);
 }
 
-void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
+void	draw_map_on_img(t_data img, t_camera camera, t_object *obj_list, t_light *plh)
 {
 	double	xs;
 	double	ys;
@@ -198,12 +198,24 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 	ys = 0.0;
 	while (ys < WIN_HEIGHT)
 	{
-		pw.y = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
+		// pw.y = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
+		double fy = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
 		xs = 0.0;
 		while (xs < WIN_WIDTH)
 		{
-			pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
-			de = vec_sub(pw, pe);
+			// pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
+			double fx = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
+			t_vec ey = (t_vec){0, 1, 0};
+			t_vec pt = (t_vec){1, 0, 15};
+			t_vec df = vec_sub(pt, camera.pe);
+			t_vec dfdash = vec_norm(df);
+			t_vec dx = vec_cross(ey, dfdash);
+			t_vec dy = vec_cross(dfdash, dx);
+			// double	m = (WIN_WIDTH / 2) * (1 / tan(camera.fov / 2 * (M_PI / 180)));
+			double m = 3;
+			pw = vec_add(vec_add(camera.pe, vec_mult(dfdash, m)), vec_add(vec_mult(dx, fx), vec_mult(dy, fy)));
+
+			de = vec_sub(pw, camera.pe);
 
 			t_object *head = obj_list;
 			t = -1;
@@ -213,11 +225,11 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 			{
 				double ttmp = -1;
 				if (obj_list->type == O_SPHERE)
-					ttmp = detect_collision_and_get_vect_sphere(pe, obj_list, de);
+					ttmp = detect_collision_and_get_vect_sphere(camera.pe, obj_list, de);
 				else if (obj_list->type == O_PLANE)
-					ttmp = detect_collision_and_get_vect_plane(pe, obj_list, de);
+					ttmp = detect_collision_and_get_vect_plane(camera.pe, obj_list, de);
 				else if (obj_list->type == O_CYLINDER)
-					ttmp = detect_collision_and_get_vect_cylinder(pe, obj_list, de);
+					ttmp = detect_collision_and_get_vect_cylinder(camera.pe, obj_list, de);
 				if (-1 != ttmp && ttmp < min && ttmp > 0)
 				{
 					nearest_obj = obj_list;
@@ -235,7 +247,7 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 				ra.g = nearest_obj->ambient.g * ia.g;
 				ra.b = nearest_obj->ambient.b * ia.b;
 
-				pi = vec_add(pe, vec_mult(de, t));
+				pi = vec_add(camera.pe, vec_mult(de, t));
 				t_light *lhead = plh;
 				rd = set_color(0.0, 0.0, 0.0);
 				rs = set_color(0.0, 0.0, 0.0);
@@ -276,7 +288,7 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 						else if (nearest_obj->type == O_CYLINDER)
 						{
 							// n = vec_norm(vec_sub(vec_add(pe, vec_mult(de, t)), ((t_cylinder *)nearest_obj->obj)->pc));
-							t_vec ptmp = vec_add(pe, vec_mult(de, t));
+							t_vec ptmp = vec_add(camera.pe, vec_mult(de, t));
 							n.x = 2 * (ptmp.x - ((t_cylinder *)nearest_obj->obj)->pc.x);
 							n.y = 0;
 							n.z = 2 * (ptmp.z - ((t_cylinder *)nearest_obj->obj)->pc.z);
