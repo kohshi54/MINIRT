@@ -26,7 +26,7 @@ int	loop_handler(t_mlx_info *mlx_info)
 	pe = vec_init(0, 0, -5);
 
 	// t_light	pl3 = (t_light){(t_vec){5, 20, -5}, (t_vec){0.5, 0.5, 0.5}, NULL};
-	// t_light	pl1 = (t_light){(t_vec){5, 0, -5}, (t_vec){0.5, 0.5, 0.5}, &pl3};
+	// t_light	pl2 = (t_light){(t_vec){5, 0, -5}, (t_vec){0.5, 0.5, 0.5}, &pl3};
 	// t_light	pl1 = (t_light){(t_vec){-5, 5, -5}, (t_vec){0.5, 0.5, 0.5}, &pl2};
 	t_light	pl1 = (t_light){(t_vec){-5, 5, -5}, (t_vec){0.5, 0.5, 0.5}, NULL};
 

@@ -115,7 +115,6 @@ double	detect_collision_and_get_vect_plane(t_vec pe, t_object *obj_list, t_vec d
 
 double	detect_collision_and_get_vect_cylinder(t_vec pe, t_object *obj_list, t_vec de)
 {
-	// t_vec	vtmp;
 	double	a;
 	double	b;
 	double	c;
@@ -141,16 +140,12 @@ double	detect_collision_and_get_vect_cylinder(t_vec pe, t_object *obj_list, t_ve
 	a = vec_mag_sq(dm);
 	b = 2 * vec_dot(dm, mm);
 	c = vec_mag_sq(mm) - (((t_cylinder *)obj_list->obj)->r * ((t_cylinder *)obj_list->obj)->r);
-	if (a == 0 && c < 0)
-		return (-1);
 
 	d = b * b - 4 * a * c;
-
 	t = get_vect_cylinder(a, b, d);
 
-	/* calc valid */
-	double valid = pe.y + t * de.y;
-	if (valid < -((t_cylinder *)obj_list->obj)->h / 2.0 || ((t_cylinder *)obj_list->obj)->h / 2.0 < valid)
+	double limit_height = pe.y + t * de.y;
+	if (limit_height < -((t_cylinder *)obj_list->obj)->h / 2.0 || ((t_cylinder *)obj_list->obj)->h / 2.0 < limit_height)
 		return (-1);
 	return (t);
 }
@@ -279,7 +274,15 @@ void	draw_map_on_img(t_data img, t_vec pe, t_object *obj_list, t_light *plh)
 						else if (nearest_obj->type == O_PLANE)
 							n = vec_norm(((t_plane *)nearest_obj->obj)->n);
 						else if (nearest_obj->type == O_CYLINDER)
-							n = vec_norm(vec_sub(vec_add(pe, vec_mult(de, t)), ((t_cylinder *)nearest_obj->obj)->pc));
+						{
+							// n = vec_norm(vec_sub(vec_add(pe, vec_mult(de, t)), ((t_cylinder *)nearest_obj->obj)->pc));
+							t_vec ptmp = vec_add(pe, vec_mult(de, t));
+							n.x = 2 * (ptmp.x - ((t_cylinder *)nearest_obj->obj)->pc.x);
+							n.y = 0;
+							n.z = 2 * (ptmp.z - ((t_cylinder *)nearest_obj->obj)->pc.z);
+							// t_vec tmpv3 = vec_sub(ptmp, ((t_cylinder *)nearest_obj->obj)->pc);
+							n = vec_norm(n);
+						}
 						nldot = constraint(vec_dot(n, l), 0, 1);;
 
 						rd.r += nearest_obj->diffuse.r * ii.r * nldot;
