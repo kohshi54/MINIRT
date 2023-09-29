@@ -1,9 +1,10 @@
 NAME = miniRT
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -MMD -MP
 
 SRCS = main.c event_handler.c draw_map.c vector.c
 OBJS = $(SRCS:%.c=%.o)
+DEPS = $(SRCS:%.c=%.d)
 
 LIBFT = LIBFT/libft.a
 LIBFT_DIR = LIBFT/
@@ -31,11 +32,14 @@ clean :
 	rm -f $(OBJS)
 	$(MAKE) clean -C $(LIBFT_DIR)
 	$(MAKE) clean -C $(MLX_DIR)
+	rm -f $(DEPS)
 
 fclean : clean
 	rm -f $(NAME)
 	$(MAKE) fclean -C $(LIBFT_DIR)
 
 re : fclean all
+
+-include $(DEPS)
 
 .PHONY : clean fclean re all

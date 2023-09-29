@@ -196,15 +196,30 @@ void	draw_map_on_img(t_data img, t_camera camera, t_object *obj_list, t_light *p
 
 	pw.z = 0.0;
 	ys = 0.0;
+
+	double ws, hs;
+	if (WIN_WIDTH >= WIN_HEIGHT)
+		ws = 2;
+	else
+		ws = (2 * WIN_WIDTH) / WIN_HEIGHT;
+	
+	if (WIN_WIDTH <= WIN_HEIGHT)
+		hs = 2;
+	else
+		hs = (2 * WIN_HEIGHT) / WIN_WIDTH;
+
 	while (ys < WIN_HEIGHT)
 	{
 		// pw.y = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
-		double fy = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
+		// double fy = (-2 * ys) / (WIN_HEIGHT - 1) + 1.0;
+		double fy = (-1 * hs * ys) / (WIN_HEIGHT - 1) + (hs / 2);
 		xs = 0.0;
 		while (xs < WIN_WIDTH)
 		{
+			
 			// pw.x = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
-			double fx = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
+			// double fx = (2 * xs) / (WIN_WIDTH - 1) - 1.0;
+			double fx = (ws * xs) / (WIN_WIDTH - 1) - (ws / 2);
 			t_vec ey = (t_vec){0, 1, 0};
 			t_vec pt = (t_vec){1, 0, 15};
 			t_vec df = vec_sub(pt, camera.pe);
