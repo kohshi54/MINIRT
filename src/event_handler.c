@@ -30,7 +30,7 @@ int	loop_handler(t_mlx_info *mlx_info)
 	// t_light	pl1 = (t_light){(t_vec){-5, 5, -5}, (t_vec){0.5, 0.5, 0.5}, &pl2};
 	t_light	pl1 = (t_light){(t_vec){-5, 5, -5}, (t_vec){0.5, 0.5, 0.5}, NULL};
 
-	// /*
+	/*
 	t_plane plane = (t_plane){vec_init(0, 1, 0), vec_init(0, -1, 0)};
 	t_object object6 = (t_object){O_PLANE, &plane, NULL, (t_color){0.01, 0.01, 0.01}, (t_color){0.69, 0.69, 0.69}, (t_color){0.30, 0.30, 0.30}, 8};
 	t_sphere sphere5 = (t_sphere){vec_init(-1, 0, 5), 1.0};
@@ -43,9 +43,9 @@ int	loop_handler(t_mlx_info *mlx_info)
 	t_object object2 = (t_object){O_SPHERE, &sphere2, &object3, (t_color){0.01, 0.01, 0.01}, (t_color){0.00, 0.69, 0.00}, (t_color){0.30, 0.30, 0.30}, 8};
 	t_sphere sphere1 = (t_sphere){vec_init(3, 0, 25), 1.0};
 	t_object object1 = (t_object){O_SPHERE, &sphere1, &object2, (t_color){0.01, 0.01, 0.01}, (t_color){0.69, 0.00, 0.00}, (t_color){0.30, 0.30, 0.30}, 8};
-	// */
+	*/
 
-	/*
+	// /*
 	t_plane plane = (t_plane){vec_init(0, 1, 0), vec_init(0, -1, 0)};
 	t_object object6 = (t_object){O_PLANE, &plane, NULL, (t_color){0.01, 0.01, 0.01}, (t_color){0.69, 0.69, 0.69}, (t_color){0.30, 0.30, 0.30}, 8};
 	t_cylinder cylinder5 = (t_cylinder){vec_init(-1, 0, 5), 1.0, 2.0};
@@ -58,7 +58,7 @@ int	loop_handler(t_mlx_info *mlx_info)
 	t_object object2 = (t_object){O_CYLINDER, &cylinder2, &object3, (t_color){0.01, 0.01, 0.01}, (t_color){0.00, 0.69, 0.00}, (t_color){0.30, 0.30, 0.30}, 8};
 	t_cylinder cylinder1 = (t_cylinder){vec_init(3, 0, 25), 1.0, 2.0};
 	t_object object1 = (t_object){O_CYLINDER, &cylinder1, &object2, (t_color){0.01, 0.01, 0.01}, (t_color){0.69, 0.00, 0.00}, (t_color){0.30, 0.30, 0.30}, 8};
-	*/
+	// */
 
 	// t_cylinder cylinder1 = (t_cylinder){vec_init(0, 0, 5), 1.0, 2.0};
 	// t_object object1 = (t_object){O_CYLINDER, &cylinder1, NULL, (t_color){0.01, 0.01, 0.01}, (t_color){0.69, 0.00, 0.00}, (t_color){0.30, 0.30, 0.30}, 8};

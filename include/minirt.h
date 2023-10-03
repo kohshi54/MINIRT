@@ -4,8 +4,8 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
-# include "minilibx/mlx.h"
-# include "libft/libft.h"
+# include "mlx.h"
+# include "libft.h"
 # include <math.h>
 # include <stddef.h>
 
